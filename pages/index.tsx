@@ -1,8 +1,12 @@
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { GetServerSideProps, NextPage } from "next";
+import { useState } from "react";
 
 type Image = {
 	url: string;
+};
+
+type Props = {
+	initialImageUrl: string;
 };
 
 const fetchImage = async (): Promise<Image> => {
@@ -11,17 +15,29 @@ const fetchImage = async (): Promise<Image> => {
 	return images[0];
 };
 
-const IndexPage: NextPage = () => {
-	const [imageUrl, setImageUrl] = useState("");
-	const [loading, setLoading] = useState(true);
+// サーバーサイド
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+	const image = await fetchImage();
 
-	useEffect(() => {
-		fetchImage().then((newImage) => {
-			setLoading(false);
-			console.log(newImage.url);
-			setImageUrl(newImage.url);
-		});
-	}, []);
+	return {
+		props: {
+			initialImageUrl: image.url,
+		},
+	};
+};
+
+const IndexPage: NextPage<Props> = ({ initialImageUrl }) => {
+	const [imageUrl, setImageUrl] = useState(initialImageUrl);
+	const [loading, setLoading] = useState(false);
+
+	// クライアント側
+	// useEffect(() => {
+	// 	fetchImage().then((newImage) => {
+	// 		setLoading(false);
+	// 		console.log(newImage.url);
+	// 		setImageUrl(newImage.url);
+	// 	});
+	// }, []);
 
 	const handleClick = async () => {
 		setLoading(true);
@@ -33,8 +49,10 @@ const IndexPage: NextPage = () => {
 	return (
 		<div>
 			<h1>猫画像</h1>
-			<button onClick={handleClick}>ボタン</button>
-			{loading ? <p>ローディング中</p> : <img src={imageUrl} alt="" />}
+			<div>
+				<button onClick={handleClick}>ボタン</button>
+			</div>
+			<div>{loading ? <p>ローディング中</p> : <img src={imageUrl} alt="" />}</div>
 		</div>
 	);
 };
