@@ -27,8 +27,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 };
 
 const IndexPage: NextPage<Props> = ({ initialImageUrl }) => {
-	const [imageUrl, setImageUrl] = useState(initialImageUrl);
-	const [loading, setLoading] = useState(false);
+	const [imageUrl, setImageUrl] = useState<string>(initialImageUrl);
+	const [loading, setLoading] = useState<boolean>(false);
 
 	// クライアント側
 	// useEffect(() => {
